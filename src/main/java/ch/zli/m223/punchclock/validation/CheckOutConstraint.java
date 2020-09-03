@@ -1,6 +1,7 @@
 package ch.zli.m223.punchclock.validation;
 
 import javax.validation.Constraint;
+import javax.validation.Payload;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
@@ -12,5 +13,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface CheckOutConstraint {
 
     String message() default "Check-out has to be later than Check-in!";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }
