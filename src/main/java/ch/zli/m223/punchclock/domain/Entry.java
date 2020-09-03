@@ -1,5 +1,6 @@
 package ch.zli.m223.punchclock.domain;
 
+import ch.zli.m223.punchclock.validation.CheckOutConstraint;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -9,6 +10,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@CheckOutConstraint
 public class Entry {
 
     @Id

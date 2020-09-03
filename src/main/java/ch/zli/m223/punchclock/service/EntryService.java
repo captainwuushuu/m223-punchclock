@@ -3,10 +3,7 @@ package ch.zli.m223.punchclock.service;
 import ch.zli.m223.punchclock.domain.Entry;
 import ch.zli.m223.punchclock.repository.EntryRepository;
 import org.springframework.stereotype.Service;
-
-import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class EntryService {
