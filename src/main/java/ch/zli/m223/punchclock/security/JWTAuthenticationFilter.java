@@ -1,10 +1,13 @@
 package ch.zli.m223.punchclock.security;
 
+import com.auth0.jwt.JWT;
 import ch.zli.m223.punchclock.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -14,7 +17,15 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 
-public class JWTAuthenticationFilter extends EmailPasswordAuthenticationFilter{
+import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
+import static ch.zli.m223.punchclock.security.SecurityConstants.EXPIRATION_TIME;
+import static ch.zli.m223.punchclock.security.SecurityConstants.HEADER_STRING;
+import static ch.zli.m223.punchclock.security.SecurityConstants.SECRET;
+import static ch.zli.m223.punchclock.security.SecurityConstants.TOKEN_PREFIX;
+
+
+
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
     private AuthenticationManager authenticationManager;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -29,7 +40,7 @@ public class JWTAuthenticationFilter extends EmailPasswordAuthenticationFilter{
                     .readValue(req.getInputStream(), User.class);
 
             return authenticationManager.authenticate(
-                    new EmailPasswordAuthenticationToken(
+                    new UsernamePasswordAuthenticationToken(
                             creds.getEmail(),
                             creds.getPassword(),
                             new ArrayList<>())
