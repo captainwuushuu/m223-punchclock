@@ -1,4 +1,5 @@
 package ch.zli.m223.punchclock.service;
+import ch.zli.m223.punchclock.domain.ApplicationUser;
 import ch.zli.m223.punchclock.repository.UserRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,10 +19,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ch.zli.m223.punchclock.domain.User user = userRepository.findByEmail(username);
-        if (user == null) {
+        ApplicationUser applicationUser = userRepository.findByEmail(username);
+        if (applicationUser == null) {
             throw new UsernameNotFoundException(username);
         }
-        return new User(user.getEmail(), user.getPassword(), emptyList());
+        return new User(applicationUser.getEmail(), applicationUser.getPassword(), emptyList());
     }
 }

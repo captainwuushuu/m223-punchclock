@@ -1,7 +1,7 @@
 package ch.zli.m223.punchclock.security;
 
 import com.auth0.jwt.JWT;
-import ch.zli.m223.punchclock.domain.User;
+import ch.zli.m223.punchclock.domain.ApplicationUser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,8 +36,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
         try {
-            User creds = new ObjectMapper()
-                    .readValue(req.getInputStream(), User.class);
+            ApplicationUser creds = new ObjectMapper()
+                    .readValue(req.getInputStream(), ApplicationUser.class);
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -57,7 +57,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             Authentication auth) throws IOException, ServletException {
 
         String token = JWT.create()
-                .withSubject(((User) auth.getPrincipal()).getEmail())
+                .withSubject(((ApplicationUser) auth.getPrincipal()).getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(HMAC512(SECRET.getBytes()));
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
