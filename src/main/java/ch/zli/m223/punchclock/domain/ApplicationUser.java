@@ -10,13 +10,8 @@ public class ApplicationUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String email;
+    private String username;
     private String password;
-
-    public ApplicationUser(String email, String password) {
-        this.email = email;
-        this.password = password;
-    }
 
     //getter and setter
 
@@ -28,12 +23,12 @@ public class ApplicationUser {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
