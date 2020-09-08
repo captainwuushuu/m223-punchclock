@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Punchclock - Sign-up</title>
+</head>
+<body>
+<main>
+    <div class="col-12 col-sm-6">
+        <h1>Sign-up</h1>
+        <form id="RegisterForm">
+            <div class="form-group">
+                <label for="RegisterUsername">Username</label>
+                <input type="text" name="username" class="form-control" id="RegisterUsername" required>
+            </div>
+            <div class="form-group">
+                <label for="RegisterPassword">Password</label>
+                <input type="password" name="password" class="form-control" id="RegisterPassword" placeholder="Password"
+                       required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</main>
+</body>
+<script>
+    $(document).ready(function () {
+        var statusMessage = $('#statusMessage')
+        $('#RegisterForm').on('submit', function (e) {
+            e.preventDefault()
+            var formdata = getFormData($('#LoginForm'))
+            $.ajax({
+                    url: "http://localhost/users/sign-up",
+                    method: "POST",
+                    data: JSON.stringify(formdata),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    complete: function (resp) {
+                        statusMessage.html("Registration successful, please login")
+                    },
+                }
+            );
+        })
+    })
+
+    function getFormData($form) {
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function (n, i) {
+            indexed_array[n['name']] = n['value'];
+        });
+
+        return indexed_array;
+    }
+</script>
+</html>
