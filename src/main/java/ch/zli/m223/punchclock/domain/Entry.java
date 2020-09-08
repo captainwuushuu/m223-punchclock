@@ -28,7 +28,7 @@ public class Entry {
     private LocalDateTime checkOut;
 
     @Column(nullable = false)
-    private Category category;
+    private String category;
 
     public Long getId() {
         return id;
@@ -54,11 +54,11 @@ public class Entry {
         this.checkOut = checkOut;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         this.category = category;
     }
 }
