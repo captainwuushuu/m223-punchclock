@@ -11,12 +11,27 @@
     </head>
     <body>
         <form id="createEntryForm">
-            <label for="checkIn">Check in</label>
-            <input type="date" name="checkInDate" id="checkIn" required>
+            <!--<div class="input-group date" data-provide="datepicker">
+                <label for="checkIn">Check in</label>
+                <input type="date" name="checkInDate" id="checkIn" required class="form-control">
+                <div class="input-group-addon">
+                    <span class="glyphicon glyphicon-th"></span>
+                </div>
+            </div>-->
+
+           <label for="checkIn">Check in</label>
+            <input type="date" name="checkInDate" id="checkIn" required data-provide="datepicker">
             <input type="time" name="checkInTime" required>
             <label for="checkOut">Check out</label>
-            <input type="date" name="checkOutDate" id="checkOut" required>
+            <input type="date" name="checkOutDate" id="checkOut" required data-provide="datepicker">
             <input type="time" name="checkOutTime" required>
+            <label for="category">Category</label>
+            <select name="category" id="category">
+                <option value="Project planning">Project planning</option>
+                <option value="Coding">Coding</option>
+                <option value="Correspondence">Correspondence</option>
+                <option value="Documentation">Documentation</option>
+            </select>
             <input type="submit" value="Save" />
         </form>
         <table>
@@ -25,6 +40,7 @@
                     <th>ID</th>
                     <th>Check in</th>
                     <th>Check out</th>
+                    <th>Category</th>
                 </tr>
             </thead>
             <tbody id="entryDisplay">
@@ -34,4 +50,6 @@
             </tbody>
         </table>
     </body>
+    <script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="webjars/jquery/3.4.1/jquery.min.js"></script>
 </html>
