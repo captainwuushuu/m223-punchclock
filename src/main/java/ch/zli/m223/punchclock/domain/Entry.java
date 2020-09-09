@@ -27,8 +27,21 @@ public class Entry {
     @Column(nullable = false)
     private LocalDateTime checkOut;
 
-    @Column(nullable = false)
-    private String category;
+    //Many Entries belong to one user
+    //JoinColumn always where the key is
+    @ManyToOne
+    @JoinColumn(name="USER_ID")
+    private ApplicationUser user;
+
+    @ManyToOne
+    @JoinColumn(name="CATEGORY_ID")
+    private Category category;
+
+    @ManyToOne
+    @JoinColumn(name="DEPARTEMENT_ID")
+    private Departement departement;
+
+    //Getter and Setter
 
     public Long getId() {
         return id;
@@ -54,11 +67,27 @@ public class Entry {
         this.checkOut = checkOut;
     }
 
-    public String getCategory() {
+    public ApplicationUser getUser() {
+        return user;
+    }
+
+    public void setUser(ApplicationUser user) {
+        this.user = user;
+    }
+
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Departement getDepartement() {
+        return departement;
+    }
+
+    public void setDepartement(Departement departement) {
+        this.departement = departement;
     }
 }
