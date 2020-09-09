@@ -1,25 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"
-              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Punchclock Client</title>
-        <link rel="stylesheet" type="text/css" href="style.css" />
-        <script src="script.js" type="application/javascript"></script>
-    </head>
-    <body>
-        <form id="createEntryForm">
-            <!--<div class="input-group date" data-provide="datepicker">
-                <label for="checkIn">Check in</label>
-                <input type="date" name="checkInDate" id="checkIn" required class="form-control">
-                <div class="input-group-addon">
-                    <span class="glyphicon glyphicon-th"></span>
-                </div>
-            </div>-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Punchclock Client</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="script.js" type="application/javascript"></script>
+</head>
+<body>
+<header class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/index.html">Punchclock</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-           <label for="checkIn">Check in</label>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item disabled">
+                    <a class="nav-link disabled" href="/departements.html">Departements</a>
+                </li>
+                <li class="nav-item disabled">
+                    <a class="nav-link disabled" href="/categories.html">Categories</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-none currentUser text-info">
+            User: <span class="currentUsername mr-2"></span>
+            <a href="javascript:logout()" class="text-light">Logout</a>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6 loginWrapper">
+                <div class="card">
+                    <div class="card-body">
+                        <h2>Login</h2>
+                        <span id="loginStatus"></span>
+                        <form id="LoginForm">
+                            <div class="form-group">
+                                <label for="LoginUsername">Username</label>
+                                <input type="text" name="username" class="form-control" id="LoginUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="LoginPassword">Password</label>
+                                <input type="password" name="password" class="form-control" id="LoginPassword"
+                                       placeholder="Password"
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 registerWrapper">
+                <div class="card">
+                    <div class="card-body">
+                        <h2>Sign-up</h2>
+                        <span id="signupStatus"></span>
+                        <form id="RegisterForm">
+                            <div class="form-group">
+                                <label for="RegisterUsername">Username</label>
+                                <input type="text" name="username" class="form-control" id="RegisterUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="RegisterPassword">Password</label>
+                                <input type="password" name="password" class="form-control" id="RegisterPassword"
+                                       placeholder="Password"
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form id="createEntryForm">
+
+            <label for="checkIn">Check in</label>
             <input type="date" name="checkInDate" id="checkIn" required data-provide="datepicker">
             <input type="time" name="checkInTime" required>
             <label for="checkOut">Check out</label>
@@ -32,24 +96,92 @@
                 <option value="Correspondence">Correspondence</option>
                 <option value="Documentation">Documentation</option>
             </select>
-            <input type="submit" value="Save" />
+            <input type="submit" value="Save"/>
         </form>
         <table>
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Check in</th>
-                    <th>Check out</th>
-                    <th>Category</th>
-                </tr>
+            <tr>
+                <th>ID</th>
+                <th>Check in</th>
+                <th>Check out</th>
+                <th>Category</th>
+            </tr>
             </thead>
             <tbody id="entryDisplay">
-                <tr>
-                    <td colspan="3">Loading...</td>
-                </tr>
+            <tr>
+                <td colspan="3">Loading...</td>
+            </tr>
             </tbody>
         </table>
-    </body>
-    <script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="webjars/jquery/3.4.1/jquery.min.js"></script>
+    </div>
+</main>
+</body>
+<script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="webjars/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let loginStatus = $('#loginStatus')
+        let signupStatus = $('#signupStatus')
+        //display user
+        if (localStorage.getItem("username")) {
+            $('.currentUser').removeClass('d-none')
+            $('.currentUsername').html(localStorage.getItem('username'))
+        }
+        //Login
+        $('#LoginForm').on('submit', function (e) {
+            e.preventDefault()
+            var formdata = getFormData($('#LoginForm'))
+            $.ajax({
+                    url: "http://localhost:8081/login",
+                    method: "POST",
+                    data: JSON.stringify(formdata),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    complete: function (resp) {
+                        localStorage.setItem('token', resp.getResponseHeader('Authorization'));
+                        $('.currentUser').removeClass('d-none')
+                        $('.currentUser').find('.currentUsername').html(formdata.username)
+                        localStorage.setItem("username", formdata.username)
+                        loginStatus.html("Login successful")
+                        loginStatus.addClass("text-success")
+                    }
+                }
+            );
+        })
+        //Sign-up
+        $('#RegisterForm').on('submit', function (e) {
+            e.preventDefault()
+            console.log('submit')
+            var formdata = getFormData($('#RegisterForm'))
+            $.ajax({
+                    url: "http://localhost:8081/users/sign-up",
+                    method: "POST",
+                    data: JSON.stringify(formdata),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    complete: function (resp) {
+                        signupStatus.html("Registration successful, please login")
+                        signupStatus.addClass("text-success")
+                    }
+                }
+            );
+        })
+    })
+
+    function getFormData($form) {
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function (n, i) {
+            indexed_array[n['name']] = n['value'];
+        });
+
+        return indexed_array;
+    }
+
+    function logout() {
+        localStorage.clear()
+        window.location.href = "http://localhost:8081/index.html"
+    }
+</script>
 </html>
