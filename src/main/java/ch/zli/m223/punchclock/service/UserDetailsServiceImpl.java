@@ -1,11 +1,16 @@
 package ch.zli.m223.punchclock.service;
 import ch.zli.m223.punchclock.domain.ApplicationUser;
 import ch.zli.m223.punchclock.repository.ApplicationUserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 
@@ -24,5 +29,29 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException(username);
         }
         return new User(applicationUser.getUsername(), applicationUser.getPassword(), emptyList());
+    }
+
+    public ApplicationUser save(ApplicationUser applicationUser) {
+        return applicationUserRepository.saveAndFlush(applicationUser);
+    }
+
+    public void deleteUser(long id) {
+        applicationUserRepository.deleteById(id);
+    }
+
+    public List<ApplicationUser> findAll() {
+        return applicationUserRepository.findAll();
+    }
+
+    public void updateUser(ApplicationUser applicationUser, long id) {
+        //check if user exists
+        Optional<ApplicationUser> currentCategory = applicationUserRepository.findById(id);
+        if (!currentCategory.isPresent()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "User Not Found");
+        } else {
+            applicationUser.setId(id);
+            applicationUserRepository.save(applicationUser);
+        }
     }
 }
