@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Punchclock - Users</title>
+    <link href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<header class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/index.html">Punchclock</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/departements.html">Departements</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/categories.html">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/users.html">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/entries.html">Entries</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-none currentUser text-info">
+            User: <span class="currentUsername mr-2"></span>
+            <a href="javascript:logout()" class="text-light">Logout</a>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="container">
+        <h1>Users</h1>
+        <span id="statusMessage"></span>
+        <div id="users">
+
+        </div>
+        <a href="#" class="createUser btn btn-dark" data-toggle="modal" data-target="#createUser">Create
+            User</a>
+    </div>
+</main>
+<div id="userTemplate" class="d-none">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Username</h5>
+            <p class="card-text"></p>
+            <a href="#" data-id="" class="editUser btn btn-info" data-toggle="modal" data-target="#EditUser">Edit</a>
+            <a href="#" data-id="" class="deleteUser btn btn-danger">Delete</a>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="createUser" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="CreateUserForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="CreateUsername">Username</label>
+                    <input type="text" name="username" class="form-control" id="CreateUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="CreatePassword">Change Password</label>
+                    <input type="password" name="password" class="form-control" id="CreatePassword"
+                           placeholder="Password" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="SaveCreatedUser" type="button" class="btn btn-primary">Save new user</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="EditUser" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="EditUserForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="EditUsername">Username</label>
+                    <input type="text" name="username" class="form-control" id="EditUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="EditPassword">Change Password</label>
+                    <input type="password" name="password" class="form-control" id="EditPassword" placeholder="Password"
+                           required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="SaveEditedUser" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="webjars/jquery/3.4.1/jquery.min.js"></script>
+<script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let statusMessage = $('#statusMessage')
+
+        if (localStorage.getItem("username")) {
+            $('.currentUser').removeClass('d-none')
+            $('.currentUsername').html(localStorage.getItem('username'))
+        }
+        $('#SaveCreatedUser').click(function (e) {
+            e.preventDefault()
+            let formdata = getFormData($('#CreateUserForm'))
+            formdata = JSON.stringify(formdata)
+            $.ajax({
+                    url: "http://localhost:8081/users",
+                    type: "POST",
+                    data: formdata,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    headers: {"Authorization": localStorage.getItem('token')},
+                    success: function (resp) {
+                        statusMessage.html("User created")
+
+                    },
+                    error: function () {
+                        statusMessage.html("User creation failed")
+                    }
+                }
+            ).done(function () {
+                loadUsers()
+            });
+            $('#CreateUser').modal('hide')
+            return true;
+        })
+
+
+        loadUsers();
+
+    })
+
+    function loadUsers() {
+        let statusMessage = $('#statusMessage')
+        $.ajax({
+            url: "http://localhost:8081/users",
+            method: "GET",
+            headers: {"Authorization": localStorage.getItem('token')},
+            success: function (response) {
+                $('#users').empty()
+                response.forEach(showUsers)
+                $('.deleteUser').on('click', function () {
+                    let user = $(this)
+                    let id = user.data('id')
+                    let url = "http://localhost:8081/users/" + id
+                    $.ajax({
+                            url: url,
+                            type: "DELETE",
+                            headers: {"Authorization": localStorage.getItem('token')},
+                            complete: function (resp) {
+                                statusMessage.html("User deleted")
+                                user.parents('.card').remove()
+                            },
+                        }
+                    );
+                })
+                $('.editUser').on('click', function () {
+                    let user = $(this)
+                    let id = user.data('id')
+                    let modal = $('#EditUser')
+                    $('#EditUsername').val(user.siblings('.card-title').html())
+                    $('#SaveEditedUser').click(function (e) {
+                        e.preventDefault()
+                        let formdata = getFormData($('#EditUserForm'))
+                        formdata = JSON.stringify(formdata)
+                        $.ajax({
+                                url: "http://localhost:8081/users/" + id,
+                                type: "PUT",
+                                data: formdata,
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                headers: {"Authorization": localStorage.getItem('token')},
+                                success: function (resp) {
+                                    statusMessage.html("User edited")
+                                },
+                                error: function () {
+                                    statusMessage.html("User editing failed")
+                                }
+                            }
+                        ).done(function () {
+                            loadUsers()
+                        }).fail(function () {
+                            loadUsers()
+                        });
+                        modal.modal('hide')
+                        return true;
+                    })
+                })
+            },
+            error: function () {
+                window.location.href = "http://localhost:8081/index.html"
+            }
+        })
+    }
+
+    function showUsers(item) {
+        let userTemplate = $('#userTemplate')
+        userTemplate.find('.card-title').html(item['username'])
+        userTemplate.find('a').attr('data-id', item['id'])
+        userTemplate.toggleClass('d-none')
+        userTemplate.attr('id', '')
+        userTemplate.clone().appendTo($('#users'))
+        userTemplate.toggleClass('d-none')
+        userTemplate.attr('id', 'userTemplate')
+    }
+
+    function getFormData($form) {
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function (n, i) {
+            indexed_array[n['name']] = n['value'];
+        });
+
+        return indexed_array;
+    }
+
+    function logout() {
+        localStorage.clear()
+        window.location.href = "http://localhost:8081/index.html"
+    }
+</script>
+</body>
+</html>
