@@ -1,5 +1,7 @@
 package ch.zli.m223.punchclock.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -13,6 +15,7 @@ public class Category {
     //One Category can have many entries
     //mapped by name of key in other class
     @OneToMany(mappedBy = "category")
+    @JsonIgnore
     private List<Entry> entries;
 
     //getter and setter
