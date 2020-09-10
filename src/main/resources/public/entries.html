@@ -51,9 +51,13 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Category</h5>
-            <p class="card-text"></p>
-            <a href="#" data-id="" class="editUser btn btn-info" data-toggle="modal" data-target="#EditUser">Edit</a>
-            <a href="#" data-id="" class="deleteUser btn btn-danger">Delete</a>
+            <p class="card-text card-checkin"></p>
+            <p class="card-text card-checkout"></p>
+            <p class="card-text card-category"></p>
+            <p class="card-text card-departement"></p>
+            <p class="card-text card-user"></p>
+            <a href="#" data-id="" class="editEntry btn btn-info" data-toggle="modal" data-target="#EditEntry">Edit</a>
+            <a href="#" data-id="" class="deleteEntry btn btn-danger">Delete</a>
         </div>
     </div>
 </div>
@@ -82,26 +86,23 @@
                 </div>
                 <div class="form-group">
                     <label for="Categories">Category</label>
-                    <select name="category" id="Categories">
+                    <select name="categories" class="form-control" id="Categories" required>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="CreateDepartement">Departement</label>
-                    <select name="departement" id="CreateDepartement">
-                        <option value="IT">IT</option>
-                        <option value="Backoffice">Backoffice</option>
-                        <option value="Helpdesk">Helpdesk</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="Users">User</label>
-                    <select type="text" name="users" class="form-control" id="Users" required>
+                    <label for="Departements">Departement</label>
+                    <select type="text" name="departements" class="form-control" id="Departements" required>
                     </select>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button id="SaveCreatedEntry" type="button" class="btn btn-primary">Save new entry</button>
+            </div>
+            <div class="form-group">
+                <label for="Users">User</label>
+                <select type="text" name="users" class="form-control" id="Users" required>
+                </select>
             </div>
         </form>
     </div>
@@ -129,24 +130,18 @@
                     <input type="time" name="checkOutTime" required>
                 </div>
                 <div class="form-group">
-                    <label for="EditCategory">Category</label>
-                    <select name="category" id="EditCategory">
-                        <option value="Project planning">Project planning</option>
-                        <option value="Coding">Coding</option>
-                        <option value="Correspondence">Correspondence</option>
-                        <option value="Documentation">Documentation</option>
+                    <label for="Categories">Category</label>
+                    <select name="categories" class="form-control" id="Categories" required>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="EditDepartement">Departement</label>
-                    <select name="departement" id="EditDepartement">
-                        <option value="IT">IT</option>
-                        <option value="Backoffice">Backoffice</option>
-                        <option value="Helpdesk">Helpdesk</option>
+                    <label for="Departements">Departement</label>
+                    <select type="text" name="departements" class="form-control" id="Departements" required>
                     </select>
                 </div>
                 <div class="form-group">
-                    <select type="text" name="users" class="form-control" id="users" required>
+                    <label for="Users">User</label>
+                    <select type="text" name="users" class="form-control" id="Users" required>
                     </select>
                 </div>
             </div>
@@ -164,6 +159,7 @@
         let statusMessage = $('#statusMessage')
         let username = ""
         if (localStorage.getItem("username")) {
+            //Set username for retrieval of loggedInUser
             username = localStorage.getItem('username')
             $('.currentUser').removeClass('d-none')
             $('.currentUsername').html(username)
@@ -173,14 +169,25 @@
         loadCategories()
         loadDepartements()
 
+        const dateAndTimeToDate = (dateString, timeString) => {
+            return new Date(`${dateString}T${timeString}`).toISOString();
+        };
+
         $('#SaveCreatedEntry').click(function (e) {
             e.preventDefault()
-            let formdata = getFormData($('#CreateEntryForm'))
-            formdata = JSON.stringify(formdata)
+            let formData = getFormData($('#CreateEntryForm'))
+            const entry = {};
+            entry['checkIn'] = dateAndTimeToDate(formData['checkInDate'], formData['checkInTime']).slice(0,-8);
+            entry['checkOut'] = dateAndTimeToDate(formData['checkOutDate'], formData['checkOutTime']).slice(0,-8);
+            entry['category'] = {id:formData['categories']};
+            entry['departement'] = {id:formData['departements']};
+            entry['user'] = {id:formData['users']};
+            formData = JSON.stringify(entry)
+            console.log(formData)
             $.ajax({
                     url: "http://localhost:8081/entries",
                     type: "POST",
-                    data: formdata,
+                    data: formData,
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     headers: {"Authorization": localStorage.getItem('token')},
@@ -214,10 +221,25 @@
                 createOptions(response, item)
             },
             error: function () {
-                window.location.href = "http://localhost:8081/index.html"
+                console.log("could not load users")
             }
         })
     }
+
+   /* function loadUser(username) {
+        $.ajax({
+            url: "http://localhost:8081/users/" + username,
+            method: "GET",
+            headers: {"Authorization": localStorage.getItem('token')},
+            success: function (response) {
+                console.log('user:' + JSON.stringify(response))
+                return response;
+            },
+            error: function () {
+                console.log("user retrieval by username failed")
+            }
+        })
+    }*/
 
     function loadCategories() {
         $.ajax({
@@ -230,10 +252,11 @@
                 createOptions(response, item)
             },
             error: function () {
-                window.location.href = "http://localhost:8081/index.html"
+                console.log("could not load categories")
             }
         })
     }
+
     function loadDepartements() {
         $.ajax({
             url: "http://localhost:8081/departements",
@@ -245,7 +268,7 @@
                 createOptions(response, item)
             },
             error: function () {
-                window.location.href = "http://localhost:8081/index.html"
+                console.log("could not load departements")
             }
         })
     }
@@ -255,13 +278,13 @@
         let selectItem = '';
         $.each(input, function (key, value) {
             if (item === "users") {
-                optionItems += '<option value=' + key + '>' + value['username'] + '</option>';
+                optionItems += '<option value=' + (key+1) + '>' + value['username'] + '</option>';
                 selectItem = $('#Users')
             } else if (item === "categories") {
-                optionItems += '<option value=' + key + '>' + value['categoryName'] + '</option>';
+                optionItems += '<option value=' + (key+1) + '>' + value['categoryName'] + '</option>';
                 selectItem = $('#Categories')
             } else if (item === "departements") {
-                optionItems += '<option value=' + key + '>' + value['departementName'] + '</option>';
+                optionItems += '<option value=' + (key+1) + '>' + value['departementName'] + '</option>';
                 selectItem = $('#Departements')
             }
         });
@@ -355,6 +378,11 @@
     function showEntries(item) {
         let entryTemplate = $('#entryTemplate')
         entryTemplate.find('.card-title').html(item['checkIn'])
+        entryTemplate.find('.card-checkin').html(item['checkIn'])
+        entryTemplate.find('.card-checkout').html(item['checkOut'])
+        entryTemplate.find('.card-departement').html(item['departementName'])
+        entryTemplate.find('.card-category').html(item['categoryName'])
+        entryTemplate.find('.card-user').html(item['username'])
         entryTemplate.find('a').attr('data-id', item['id'])
         entryTemplate.toggleClass('d-none')
         entryTemplate.attr('id', '')
