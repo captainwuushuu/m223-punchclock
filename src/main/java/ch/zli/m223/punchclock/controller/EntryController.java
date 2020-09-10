@@ -16,13 +16,23 @@ public class EntryController {
     public EntryController(EntryService entryService) {
         this.entryService = entryService;
     }
-
+    /**
+     * Gets all entries
+     *
+     * @return List of entries
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Entry> getAllEntries() {
         return entryService.findAll();
     }
 
+    /**
+     * Creates an entry
+     *
+     * @param entry
+     * @return entry
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Entry createEntry(@Valid @RequestBody Entry entry) {
@@ -34,20 +44,19 @@ public class EntryController {
      *
      * @param id of the to be deleted entry
      */
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") Long id) {
         entryService.deleteEntry(id);
     }
     /**
      * Updates an entry.
-     *
+     * @param id of the to be updated entry
      * @param entry to be updated
-     * @return an updated entry
      */
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Entry update(@RequestBody Entry entry) {
-        return entryService.updateEntry(entry);
+    public void updateUser(@PathVariable("id") long id, @Valid @RequestBody Entry entry){
+        entryService.updateEntry(entry);
     }
 }

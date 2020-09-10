@@ -344,6 +344,9 @@
                         }
                     );
                 })
+                const dateAndTimeToDate = (dateString, timeString) => {
+                    return new Date(`${dateString}T${timeString}`).toISOString();
+                };
                 $('.editEntry').on('click', function () {
                     let entry = $(this)
                     let id = entry.data('id')
@@ -353,13 +356,13 @@
                         e.preventDefault()
                         let formData = getFormData($('#EditEntryForm'))
                         const entry = {};
-                        entry['editCheckIn'] = dateAndTimeToDate(formData['editCheckInDate'], formData['editCheckInTime']).slice(0,-8);
-                        entry['editCheckOut'] = dateAndTimeToDate(formData['editCheckOutDate'], formData['editCheckOutTime']).slice(0,-8);
-                        entry['editCategory'] = {id:formData['editCategories']};
-                        entry['editDepartement'] = {id:formData['editDepartements']};
-                        entry['editUser'] = {id:formData['editUsers']};
-                        formData = JSON.stringify(entry)
+                        entry['checkIn'] = dateAndTimeToDate(formData['editCheckInDate'], formData['editCheckInTime']).slice(0,-8);
+                        entry['checkOut'] = dateAndTimeToDate(formData['editCheckOutDate'], formData['editCheckOutTime']).slice(0,-8);
+                        entry['category'] = {id:formData['editCategories']};
+                        entry['departement'] = {id:formData['editDepartements']};
+                        entry['user'] = {id:formData['editUsers']};
                         console.log(formData)
+                        formData = JSON.stringify(entry)
                         $.ajax({
                                 url: "http://localhost:8081/entries/" + id,
                                 type: "PUT",
