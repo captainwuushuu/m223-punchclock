@@ -17,12 +17,22 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
+    /**
+     * Gets all categories
+     * @return list of categories
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Category> getAllCategories() {
         return categoryService.findAll();
     }
 
+    /**
+     * Category create endpoint
+     *
+     * @param category
+     * @return category
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Category createCategory(@Valid @RequestBody Category category) {

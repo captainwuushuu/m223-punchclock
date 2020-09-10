@@ -17,12 +17,22 @@ public class DepartementController {
         this.departementService = departementService;
     }
 
+    /**
+     * Gets all departements
+     *
+     * @return list of departements
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Departement> getAllDepartements() {
         return departementService.findAll();
     }
 
+    /**
+     * Creates a departement
+     * @param departement
+     * @return created departement
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Departement createDepartement(@Valid @RequestBody Departement departement) {

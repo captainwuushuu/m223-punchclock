@@ -31,9 +31,9 @@ public class UserController {
     }
 
     /**
-     * create and return new applicationUser
-     * @param applicationUser
-     * @return applicationUser
+     * This is the sign up endpoint.
+     *
+     * @return the newly created user
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
