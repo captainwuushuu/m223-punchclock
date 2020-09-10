@@ -31,20 +31,20 @@ public class UserController {
     }
 
     /**
-     * create and return new user
-     * @param user
-     * @return user
+     * create and return new applicationUser
+     * @param applicationUser
+     * @return applicationUser
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationUser createEntry(@Valid @RequestBody ApplicationUser user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        return userDetailsServiceImpl.save(user);
+    public ApplicationUser createEntry(@Valid @RequestBody ApplicationUser applicationUser) {
+        applicationUser.setPassword(bCryptPasswordEncoder.encode(applicationUser.getPassword()));
+        return userDetailsServiceImpl.save(applicationUser);
     }
 
     /**
-     * Returns all Users
-     * @return List<User>
+     * Returns all applicationUsers
+     * @return List<ApplicationUser>
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     /**
-     * Delete User with specified id
+     * Delete user with specified id
      * @param id
      */
     @DeleteMapping("/{id}")
@@ -64,12 +64,22 @@ public class UserController {
     /**
      * Update User with specified id and data
      * @param id
-     * @param user
+     * @param applicationUser
      */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void updateUser(@PathVariable("id") long id, @Valid @RequestBody ApplicationUser applicationUser){
         applicationUser.setPassword(bCryptPasswordEncoder.encode(applicationUser.getPassword()));
         userDetailsServiceImpl.updateUser(applicationUser,id);
+    }
+    /**
+     * Get user by username
+     * @param username
+     * @return ApplicationUser
+     */
+    @GetMapping("/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public ApplicationUser getUserByUsername(@PathVariable String username) {
+        return  applicationUserRepository.findByUsername(username);
     }
 }
