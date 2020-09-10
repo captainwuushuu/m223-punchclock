@@ -94,15 +94,16 @@
                     <select type="text" name="departements" class="form-control" id="Departements" required>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="Users">User</label>
+                    <select type="text" name="users" class="form-control" id="Users" required>
+                    </select>
+                </div>
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button id="SaveCreatedEntry" type="button" class="btn btn-primary">Save new entry</button>
-            </div>
-            <div class="form-group">
-                <label for="Users">User</label>
-                <select type="text" name="users" class="form-control" id="Users" required>
-                </select>
             </div>
         </form>
     </div>
@@ -119,29 +120,29 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label for="EditCheckIn">Check in</label>
-                    <input type="date" name="checkInDate" class="form-control" id="EditCheckIn" required
+                    <input type="date" name="editCheckInDate" class="form-control" id="EditCheckIn" required
                            data-provide="datepicker">
-                    <input type="time" name="checkInTime" required>
+                    <input type="time" name="editCheckInTime" required>
                 </div>
                 <div class="form-group">
-                    <label for="CreateCheckOut">Check out</label>
-                    <input type="date" name="checkOutDate" class="form-control" id="EditCheckOut" required
+                    <label for="EditCheckOut">Check out</label>
+                    <input type="date" name="editCheckOutDate" class="form-control" id="EditCheckOut" required
                            data-provide="datepicker">
-                    <input type="time" name="checkOutTime" required>
+                    <input type="time" name="editCheckOutTime" required>
                 </div>
                 <div class="form-group">
-                    <label for="Categories">Category</label>
-                    <select name="categories" class="form-control" id="Categories" required>
+                    <label for="EditCategories">Category</label>
+                    <select name="editCategories" class="form-control" id="EditCategories" required>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="Departements">Departement</label>
-                    <select type="text" name="departements" class="form-control" id="Departements" required>
+                    <label for="EditDepartements">Departement</label>
+                    <select type="text" name="editDepartements" class="form-control" id="EditDepartements" required>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="Users">User</label>
-                    <select type="text" name="users" class="form-control" id="Users" required>
+                    <label for="EditUsers">User</label>
+                    <select type="text" class="form-control" name="editUsers" id="EditUsers" required>
                     </select>
                 </div>
             </div>
@@ -218,6 +219,7 @@
             success: function (response) {
                 let item = "users"
                 $('#Users').empty()
+                $('#EditUsers').empty()
                 createOptions(response, item)
             },
             error: function () {
@@ -249,6 +251,7 @@
             success: function (response) {
                 let item = "categories"
                 $('#Categories').empty()
+                $('#EditCategories').empty()
                 createOptions(response, item)
             },
             error: function () {
@@ -265,6 +268,7 @@
             success: function (response) {
                 let item = "departements"
                 $('#Departements').empty()
+                $('#EditDepartements').empty()
                 createOptions(response, item)
             },
             error: function () {
@@ -276,19 +280,24 @@
     function createOptions(input, item) {
         let optionItems = '';
         let selectItem = '';
+        let selectEditItem = '';
         $.each(input, function (key, value) {
             if (item === "users") {
                 optionItems += '<option value=' + (key+1) + '>' + value['username'] + '</option>';
                 selectItem = $('#Users')
+                selectEditItem = $('#EditUsers')
             } else if (item === "categories") {
                 optionItems += '<option value=' + (key+1) + '>' + value['categoryName'] + '</option>';
                 selectItem = $('#Categories')
+                selectEditItem = $('#EditCategories')
             } else if (item === "departements") {
                 optionItems += '<option value=' + (key+1) + '>' + value['departementName'] + '</option>';
                 selectItem = $('#Departements')
+                selectEditItem = $('#EditDepartements')
             }
         });
         selectItem.append(optionItems);
+        selectEditItem.append(optionItems);
     }
 
     /** End of loading functions for select */
@@ -342,12 +351,19 @@
                     $('#EditCheckIn').val(entry.siblings('.card-title').html())
                     $('#SaveEditedEntry').click(function (e) {
                         e.preventDefault()
-                        let formdata = getFormData($('#EditEntryForm'))
-                        formdata = JSON.stringify(formdata)
+                        let formData = getFormData($('#EditEntryForm'))
+                        const entry = {};
+                        entry['editCheckIn'] = dateAndTimeToDate(formData['editCheckInDate'], formData['editCheckInTime']).slice(0,-8);
+                        entry['editCheckOut'] = dateAndTimeToDate(formData['editCheckOutDate'], formData['editCheckOutTime']).slice(0,-8);
+                        entry['editCategory'] = {id:formData['editCategories']};
+                        entry['editDepartement'] = {id:formData['editDepartements']};
+                        entry['editUser'] = {id:formData['editUsers']};
+                        formData = JSON.stringify(entry)
+                        console.log(formData)
                         $.ajax({
                                 url: "http://localhost:8081/entries/" + id,
                                 type: "PUT",
-                                data: formdata,
+                                data: formData,
                                 contentType: "application/json; charset=utf-8",
                                 dataType: "json",
                                 headers: {"Authorization": localStorage.getItem('token')},
@@ -377,12 +393,12 @@
     // TODO: showEntries format and expand
     function showEntries(item) {
         let entryTemplate = $('#entryTemplate')
-        entryTemplate.find('.card-title').html(item['checkIn'])
-        entryTemplate.find('.card-checkin').html(item['checkIn'])
-        entryTemplate.find('.card-checkout').html(item['checkOut'])
-        entryTemplate.find('.card-departement').html(item['departementName'])
-        entryTemplate.find('.card-category').html(item['categoryName'])
-        entryTemplate.find('.card-user').html(item['username'])
+        entryTemplate.find('.card-title').html(item['departement']['departementName'])
+        entryTemplate.find('.card-checkin').html("Check-In: " + item['checkIn'])
+        entryTemplate.find('.card-checkout').html("Check-Out: " + item['checkOut'])
+        entryTemplate.find('.card-departement').html("Departement: " + item['departement']['departementName'])
+        entryTemplate.find('.card-category').html("Category: " + item['category']['categoryName'])
+        entryTemplate.find('.card-user').html("User: " + item['user']['username'])
         entryTemplate.find('a').attr('data-id', item['id'])
         entryTemplate.toggleClass('d-none')
         entryTemplate.attr('id', '')
