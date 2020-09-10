@@ -1,9 +1,9 @@
 package ch.zli.m223.punchclock.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class ApplicationUser {
@@ -12,6 +12,9 @@ public class ApplicationUser {
     private Long id;
     private String username;
     private String password;
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Entry> entries;
 
     //getter and setter
 
@@ -37,5 +40,13 @@ public class ApplicationUser {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Entry> getEntries() {
+        return entries;
+    }
+
+    public void setEntries(List<Entry> entries) {
+        this.entries = entries;
     }
 }
