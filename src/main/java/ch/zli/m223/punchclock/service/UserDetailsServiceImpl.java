@@ -43,15 +43,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return applicationUserRepository.findAll();
     }
 
-    public void updateUser(ApplicationUser applicationUser, long id) {
-        //check if user exists
-        Optional<ApplicationUser> currentCategory = applicationUserRepository.findById(id);
-        if (!currentCategory.isPresent()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "User Not Found");
+    public ApplicationUser updateUser(ApplicationUser applicationUser) {
+        if (applicationUserRepository.existsById(applicationUser.getId())) {
+            applicationUserRepository.saveAndFlush(applicationUser);
+            return applicationUser;
         } else {
-            applicationUser.setId(id);
-            applicationUserRepository.save(applicationUser);
+            throw new UsernameNotFoundException(applicationUser.getUsername());
         }
     }
 }
