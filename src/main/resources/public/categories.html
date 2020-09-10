@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Punchclock Categories</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="webjars/jquery/3.4.1/jquery.min.js"></script>
+    <script src="script.js" type="application/javascript"></script>
+</head>
+<body>
+<header class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="/index.html">Punchclock</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/departements.html">Departements</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/categories.html">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/users.html">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/entries.html">Entries</a>
+                </li>
+            </ul>
+        </div>
+        <div class="d-none currentUser text-info">
+            User: <span class="currentUsername mr-2"></span>
+            <a href="javascript:logout()" class="text-light">Logout</a>
+        </div>
+    </nav>
+</header>
+<main>
+    <div class="container">
+        <h1>Categories</h1>
+        <span id="statusMessage"></span>
+        <div id="Categories"></div>
+        <a href="#" class="createCategory btn btn-dark" data-toggle="modal" data-target="#createCategory">Create
+            Category</a>
+    </div>
+</main>
+
+<div id="CategoryTemplate" class="d-none">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Category</h4>
+            <p class="card-text"></p>
+            <a href="#" data-id="" class="editCategory btn btn-info" data-toggle="modal" data-target="#EditCategory">Edit</a>
+            <a href="#" data-id="" class="deleteCategory btn btn-danger">Delete</a>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="createCategory" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="CreateCategoryForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create new category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="CreateCategoryName">Category</label>
+                    <input type="text" name="categoryName" class="form-control" id="CreateCategoryName" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="SaveCreatedCategory" type="button" class="btn btn-primary">Save new category</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="EditCategory" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <form id="EditCategoryForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="EditCategoryName">Category</label>
+                    <input type="text" name="categoryName" class="form-control" id="EditCategoryName" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button id="SaveEditedCategory" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="webjars/jquery/3.4.1/jquery.min.js"></script>
+<script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let statusMessage = $('#statusMessage')
+
+        if (localStorage.getItem("username")) {
+            $('.currentUser').removeClass('d-none')
+            $('.currentUsername').html(localStorage.getItem('username'))
+        }
+        $('#SaveCreatedCategory').click(function (e) {
+            e.preventDefault()
+            let formdata = getFormData($('#CreateCategoryForm'))
+            formdata = JSON.stringify(formdata)
+            $.ajax({
+                    url: "http://localhost:8081/categories",
+                    type: "POST",
+                    data: formdata,
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    headers: {"Authorization": localStorage.getItem('token')},
+                    success: function (resp) {
+                        statusMessage.html("Category created")
+                    },
+                    error: function () {
+                        statusMessage.html("Category creation failed")
+                    }
+                }
+            ).done(function () {
+                loadCategories()
+            });
+            $('#CreateCategory').modal('hide')
+            return true;
+        })
+        loadCategories();
+    })
+
+    function loadCategories() {
+        let statusMessage = $('#statusMessage')
+        $.ajax({
+            url: "http://localhost:8081/categories",
+            method: "GET",
+            headers: {"Authorization": localStorage.getItem('token')},
+            success: function (response) {
+                $('#Categories').empty()
+                response.forEach(showCategories)
+                $('.deleteCategory').on('click', function () {
+                    let category = $(this)
+                    let id = category.data('id')
+                    let url = "http://localhost:8081/categories/" + id
+                    $.ajax({
+                            url: url,
+                            type: "DELETE",
+                            headers: {"Authorization": localStorage.getItem('token')},
+                            complete: function (resp) {
+                                statusMessage.html("Category deleted")
+                                category.parents('.card').remove()
+                            },
+                        }
+                    );
+                })
+                $('.editCategory').on('click', function () {
+                    let category = $(this)
+                    let id = category.data('id')
+                    let modal = $('#EditCategory')
+                    $('#EditCategoryName').val(category.siblings('.card-title').html())
+                    $('#SaveEditedCategory').click(function (e) {
+                        e.preventDefault()
+                        let formdata = getFormData($('#EditCategoryForm'))
+                        formdata = JSON.stringify(formdata)
+                        $.ajax({
+                                url: "http://localhost:8081/categories/" + id,
+                                type: "PUT",
+                                data: formdata,
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                headers: {"Authorization": localStorage.getItem('token')},
+                                success: function (resp) {
+                                    statusMessage.html("Category edited")
+                                },
+                                error: function () {
+                                    statusMessage.html("Category editing failed")
+                                }
+                            }
+                        ).done(function () {
+                            loadCategories()
+                        }).fail(function () {
+                            loadCategories()
+                        });
+                        modal.modal('hide')
+                        return true;
+                    })
+                })
+            },
+            error: function () {
+                window.location.href = "http://localhost:8081/index.html"
+            }
+        })
+    }
+
+    function showCategories(item) {
+        let categoryTemplate = $('#CategoryTemplate')
+        categoryTemplate.find('.card-title').html(item['categoryName'])
+        categoryTemplate.find('a').attr('data-id', item['id'])
+        categoryTemplate.toggleClass('d-none')
+        categoryTemplate.attr('id', '')
+        categoryTemplate.clone().appendTo($('#Categories'))
+        categoryTemplate.toggleClass('d-none')
+        categoryTemplate.attr('id', 'CategoryTemplate')
+    }
+
+    function getFormData($form) {
+        var unindexed_array = $form.serializeArray();
+        var indexed_array = {};
+
+        $.map(unindexed_array, function (n, i) {
+            indexed_array[n['name']] = n['value'];
+        });
+
+        return indexed_array;
+    }
+
+    function logout() {
+        localStorage.clear()
+        window.location.href = "http://localhost:8081/index.html"
+    }
+</script>
+</body>
+</html>
