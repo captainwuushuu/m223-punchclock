@@ -1,16 +1,13 @@
 package ch.zli.m223.punchclock.service;
 import ch.zli.m223.punchclock.domain.ApplicationUser;
 import ch.zli.m223.punchclock.repository.ApplicationUserRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 
@@ -43,7 +40,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return applicationUserRepository.findAll();
     }
 
-    public ApplicationUser updateUser(ApplicationUser applicationUser) {
+    public ApplicationUser updateUser(ApplicationUser applicationUser, long id) {
         if (applicationUserRepository.existsById(applicationUser.getId())) {
             applicationUserRepository.saveAndFlush(applicationUser);
             return applicationUser;

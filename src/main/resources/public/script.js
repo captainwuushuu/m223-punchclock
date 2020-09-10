@@ -12,7 +12,7 @@ const createEntry = (e) => {
     entry['checkIn'] = dateAndTimeToDate(formData.get('checkInDate'), formData.get('checkInTime'));
     entry['checkOut'] = dateAndTimeToDate(formData.get('checkOutDate'), formData.get('checkOutTime'));
     entry['category'] = formData.get('category');
-    console.log(entry['category']);
+    entry['departement'] = formData.get('departement');
 
     fetch(`${URL}/entries`, {
         method: 'POST',
@@ -55,6 +55,7 @@ const renderEntries = () => {
         row.appendChild(createCell(new Date(entry.checkIn).toLocaleString()));
         row.appendChild(createCell(new Date(entry.checkOut).toLocaleString()));
         row.appendChild(createCell(new Text(entry.category).valueOf()));
+        row.appendChild(createCell(new Text(entry.departement).valueOf()));
         display.appendChild(row);
     });
 };

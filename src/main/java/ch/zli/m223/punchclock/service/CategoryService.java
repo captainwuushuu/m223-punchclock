@@ -26,6 +26,7 @@ public class CategoryService {
     }
 
     public Category updateCategory(Category category) {
+        //check if category exists
         if (categoryRepository.existsById(category.getId())) {
             categoryRepository.saveAndFlush(category);
             return category;
