@@ -16,8 +16,8 @@ Folgende Dienste stehen während der Ausführung im Profil `dev` zur Verfügung:
 Folgende Schritte befolgen um loszulegen:
 1. Programm starten (Run Punchclock)
 2. über http://localhost:8081/index.html kann auf die Applikation zugegriffen werden
-3. falls kein Konto bekannt, kann über das Sign-up-Formular ein neuer Benutzer erstellt werden
-4. Bei erfolgreichem Sign up sich danach einloggen (Login Formular)
+3. mit username "admin" und password "admin" einloggen
+4. alternativ kann über das angezeigt signup Formular ein neuer Benutzer erstellt werden
 5. Über die Navigation kann auf verschiedene Bereiche zugegriffen werden: Departements, Categories, Users und Entries
 6. Departements: Hier können bereits bestehende Departements verwaltet und neue erstellt werden
 7. Categories: Hier können bereits bestehende Categories verwaltet und neue erstellt werden
