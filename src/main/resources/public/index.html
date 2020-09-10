@@ -8,6 +8,8 @@
     <title>Punchclock Client</title>
     <link rel="stylesheet" type="text/css" href="style.css"/>
     <link href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="webjars/jquery/3.4.1/jquery.min.js"></script>
     <script src="script.js" type="application/javascript"></script>
 </head>
 <body>
@@ -21,11 +23,17 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item disabled">
-                    <a class="nav-link disabled" href="/departements.html">Departements</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/departements.html">Departements</a>
                 </li>
-                <li class="nav-item disabled">
-                    <a class="nav-link disabled" href="/categories.html">Categories</a>
+                <li class="nav-item">
+                    <a class="nav-link" href="/categories.html">Categories</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/users.html">Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/entries.html">Entries</a>
                 </li>
             </ul>
         </div>
@@ -81,43 +89,10 @@
                 </div>
             </div>
         </div>
-        <form id="createEntryForm">
-
-            <label for="checkIn">Check in</label>
-            <input type="date" name="checkInDate" id="checkIn" required data-provide="datepicker">
-            <input type="time" name="checkInTime" required>
-            <label for="checkOut">Check out</label>
-            <input type="date" name="checkOutDate" id="checkOut" required data-provide="datepicker">
-            <input type="time" name="checkOutTime" required>
-            <label for="category">Category</label>
-            <select name="category" id="category">
-                <option value="Project planning">Project planning</option>
-                <option value="Coding">Coding</option>
-                <option value="Correspondence">Correspondence</option>
-                <option value="Documentation">Documentation</option>
-            </select>
-            <input type="submit" value="Save"/>
-        </form>
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Check in</th>
-                <th>Check out</th>
-                <th>Category</th>
-            </tr>
-            </thead>
-            <tbody id="entryDisplay">
-            <tr>
-                <td colspan="3">Loading...</td>
-            </tr>
-            </tbody>
-        </table>
+        <!---->
     </div>
 </main>
 </body>
-<script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-<script src="webjars/jquery/3.4.1/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
         let loginStatus = $('#loginStatus')
